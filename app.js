@@ -2387,7 +2387,7 @@ function renderFlashcards(area) {
             <span>${showingAnswer ? "เฉลย" : "คำถาม"}</span>
           </div>
           <div class="flashcard-progress" aria-hidden="true"><span></span></div>
-          <article class="flashcard ${showingAnswer ? "flipped" : ""}" tabindex="0" role="button" aria-pressed="${showingAnswer}" aria-label="พลิก flashcard">
+          <article class="flashcard ${showingAnswer ? "flipped show-answer" : ""}" tabindex="0" role="button" aria-pressed="${showingAnswer}" aria-label="พลิก flashcard">
             <div class="flashcard-inner">
               <div class="flash-face front">
                 <strong>คำถาม</strong>
@@ -2421,6 +2421,7 @@ function renderFlashcards(area) {
 
       showingAnswer = flipped;
       if (card._flipAnimation) card._flipAnimation.cancel();
+      if (card._faceSwapTimer) window.clearTimeout(card._faceSwapTimer);
       card.classList.remove("is-flipping");
       void card.offsetWidth;
       card.classList.add("is-flipping");
@@ -2428,8 +2429,13 @@ function renderFlashcards(area) {
       card.setAttribute("aria-pressed", String(flipped));
       flipButton.textContent = flipped ? "กลับไปดูคำถาม" : "พลิกการ์ด";
       area.querySelector(".flashcard-counter span:last-child").textContent = flipped ? "เฉลย" : "คำถาม";
+      const swapFace = () => {
+        card.classList.toggle("show-answer", flipped);
+        card._faceSwapTimer = null;
+      };
 
       if (!prefersReducedMotion && inner?.animate) {
+        card._faceSwapTimer = window.setTimeout(swapFace, 340);
         card._flipAnimation = inner.animate([
           {
             transform: `translateY(0) rotateY(${from}deg) rotateX(0deg) scale(1)`,
@@ -2450,9 +2456,14 @@ function renderFlashcards(area) {
         });
         card._flipAnimation.addEventListener("finish", () => {
           card.classList.remove("is-flipping");
+          if (card._faceSwapTimer) {
+            window.clearTimeout(card._faceSwapTimer);
+            swapFace();
+          }
           card._flipAnimation = null;
         }, { once: true });
       } else {
+        swapFace();
         window.setTimeout(() => card.classList.remove("is-flipping"), 220);
       }
     };
