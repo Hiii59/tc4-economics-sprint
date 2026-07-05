@@ -16,6 +16,35 @@ const colors = {
 };
 
 const canvasFontStack = '"TH Sarabun New", "THSarabunNew", "TH SarabunPSK", "THSarabunPSK", Sarabun, Tahoma, Arial';
+const motionStorageKey = "tc4-site-motion";
+
+function readMotionPreference() {
+  try {
+    return localStorage.getItem(motionStorageKey) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+function writeMotionPreference(enabled) {
+  try {
+    localStorage.setItem(motionStorageKey, enabled ? "on" : "off");
+  } catch {
+    // Storage may be unavailable in private or embedded browsing modes.
+  }
+}
+
+function setSiteMotion(enabled) {
+  document.documentElement.dataset.motion = enabled ? "on" : "off";
+  const button = document.getElementById("motionToggle");
+  if (button) {
+    button.setAttribute("aria-pressed", String(enabled));
+    button.textContent = enabled ? "Motion On" : "Motion Off";
+    button.title = enabled ? "Motion is on" : "Motion is off";
+  }
+}
+
+setSiteMotion(readMotionPreference());
 
 const marketScenarios = {
   rent: {
@@ -1130,6 +1159,8 @@ let revealObserver = null;
 let revealMotionReady = false;
 
 document.addEventListener("DOMContentLoaded", () => {
+  setSiteMotion(readMotionPreference());
+  setupMotionToggle();
   setupMenu();
   renderChapters();
   renderLearningSections();
@@ -1175,6 +1206,24 @@ function setupMenu() {
   });
   document.addEventListener("click", (event) => {
     if (!nav.contains(event.target) && !button.contains(event.target)) setOpen(false);
+  });
+}
+
+function setupMotionToggle() {
+  const button = document.getElementById("motionToggle");
+  if (!button) return;
+  setSiteMotion(readMotionPreference());
+  button.addEventListener("click", () => {
+    const enabled = button.getAttribute("aria-pressed") !== "true";
+    writeMotionPreference(enabled);
+    setSiteMotion(enabled);
+    if (enabled) {
+      setupPolishMotion();
+    } else {
+      if (revealObserver) revealObserver.disconnect();
+      revealObserver = null;
+      applyRevealMotion(document, true);
+    }
   });
 }
 
@@ -1359,8 +1408,11 @@ function setupPolishMotion() {
   updateProgress();
   window.addEventListener("scroll", updateProgress, { passive: true });
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = null;
+
+  const siteMotionEnabled = readMotionPreference();
+  if (!siteMotionEnabled || !("IntersectionObserver" in window)) {
     revealMotionReady = true;
     applyRevealMotion(document, true);
     return;
@@ -2412,16 +2464,13 @@ function renderFlashcards(area) {
     const card = area.querySelector(".flashcard");
     const flipButton = area.querySelector("[data-flip-card]");
     const flip = () => {
-      const inner = card.querySelector(".flashcard-inner");
       const wasFlipped = card.classList.contains("flipped");
       const flipped = !wasFlipped;
-      const from = wasFlipped ? 180 : 0;
-      const to = flipped ? 180 : 0;
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const motionEnabled = readMotionPreference();
 
       showingAnswer = flipped;
-      if (card._flipAnimation) card._flipAnimation.cancel();
       if (card._faceSwapTimer) window.clearTimeout(card._faceSwapTimer);
+      if (card._flipDoneTimer) window.clearTimeout(card._flipDoneTimer);
       card.classList.remove("is-flipping");
       void card.offsetWidth;
       card.classList.add("is-flipping");
@@ -2434,37 +2483,19 @@ function renderFlashcards(area) {
         card._faceSwapTimer = null;
       };
 
-      if (!prefersReducedMotion && inner?.animate) {
-        card._faceSwapTimer = window.setTimeout(swapFace, 340);
-        card._flipAnimation = inner.animate([
-          {
-            transform: `translateY(0) rotateY(${from}deg) rotateX(0deg) scale(1)`,
-            filter: "brightness(1)"
-          },
-          {
-            transform: `translateY(-10px) rotateY(${from + (to - from) * 0.48}deg) rotateX(1.6deg) scale(0.985)`,
-            filter: "brightness(0.92)",
-            offset: 0.48
-          },
-          {
-            transform: `translateY(0) rotateY(${to}deg) rotateX(0deg) scale(1)`,
-            filter: "brightness(1)"
-          }
-        ], {
-          duration: 820,
-          easing: "cubic-bezier(.18, .72, .18, 1)"
-        });
-        card._flipAnimation.addEventListener("finish", () => {
-          card.classList.remove("is-flipping");
+      if (motionEnabled) {
+        card._faceSwapTimer = window.setTimeout(swapFace, 300);
+        card._flipDoneTimer = window.setTimeout(() => {
           if (card._faceSwapTimer) {
             window.clearTimeout(card._faceSwapTimer);
             swapFace();
           }
-          card._flipAnimation = null;
-        }, { once: true });
+          card.classList.remove("is-flipping");
+          card._flipDoneTimer = null;
+        }, 680);
       } else {
         swapFace();
-        window.setTimeout(() => card.classList.remove("is-flipping"), 220);
+        card.classList.remove("is-flipping");
       }
     };
     const move = (direction) => {
