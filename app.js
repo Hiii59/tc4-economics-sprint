@@ -2373,6 +2373,116 @@ function renderBlanks(area) {
 }
 
 function renderFlashcards(area) {
+  let activeIndex = 0;
+  let showingAnswer = false;
+
+  const paint = () => {
+    const [front, back] = flashcards[activeIndex];
+    const progress = `${((activeIndex + 1) / flashcards.length) * 100}%`;
+    area.innerHTML = `
+      <div class="flashcard-grid">
+        <div class="flashcard-deck" style="--flash-progress: ${progress}">
+          <div class="flashcard-counter" aria-live="polite">
+            <span>Flashcard ${activeIndex + 1} / ${flashcards.length}</span>
+            <span>${showingAnswer ? "เฉลย" : "คำถาม"}</span>
+          </div>
+          <div class="flashcard-progress" aria-hidden="true"><span></span></div>
+          <article class="flashcard ${showingAnswer ? "flipped" : ""}" tabindex="0" role="button" aria-pressed="${showingAnswer}" aria-label="พลิก flashcard">
+            <div class="flashcard-inner">
+              <div class="flash-face front">
+                <strong>คำถาม</strong>
+                <h3>${inline(front)}</h3>
+                <p>คลิกเพื่อดูคำตอบ</p>
+              </div>
+              <div class="flash-face back">
+                <strong>คำตอบ</strong>
+                <p>${inline(back)}</p>
+              </div>
+            </div>
+          </article>
+          <div class="flashcard-controls" aria-label="ควบคุม flashcard">
+            <button class="deck-action prev" type="button" data-prev-flash>ก่อนหน้า</button>
+            <button class="deck-action flip" type="button" data-flip-card>${showingAnswer ? "กลับไปดูคำถาม" : "พลิกการ์ด"}</button>
+            <button class="deck-action next" type="button" data-next-flash>ถัดไป</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const card = area.querySelector(".flashcard");
+    const flipButton = area.querySelector("[data-flip-card]");
+    const flip = () => {
+      const inner = card.querySelector(".flashcard-inner");
+      const wasFlipped = card.classList.contains("flipped");
+      const flipped = !wasFlipped;
+      const from = wasFlipped ? 180 : 0;
+      const to = flipped ? 180 : 0;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      showingAnswer = flipped;
+      if (card._flipAnimation) card._flipAnimation.cancel();
+      card.classList.remove("is-flipping");
+      void card.offsetWidth;
+      card.classList.add("is-flipping");
+      card.classList.toggle("flipped", flipped);
+      card.setAttribute("aria-pressed", String(flipped));
+      flipButton.textContent = flipped ? "กลับไปดูคำถาม" : "พลิกการ์ด";
+      area.querySelector(".flashcard-counter span:last-child").textContent = flipped ? "เฉลย" : "คำถาม";
+
+      if (!prefersReducedMotion && inner?.animate) {
+        card._flipAnimation = inner.animate([
+          {
+            transform: `translateY(0) rotateY(${from}deg) rotateX(0deg) scale(1)`,
+            filter: "brightness(1)"
+          },
+          {
+            transform: `translateY(-10px) rotateY(${from + (to - from) * 0.48}deg) rotateX(1.6deg) scale(0.985)`,
+            filter: "brightness(0.92)",
+            offset: 0.48
+          },
+          {
+            transform: `translateY(0) rotateY(${to}deg) rotateX(0deg) scale(1)`,
+            filter: "brightness(1)"
+          }
+        ], {
+          duration: 820,
+          easing: "cubic-bezier(.18, .72, .18, 1)"
+        });
+        card._flipAnimation.addEventListener("finish", () => {
+          card.classList.remove("is-flipping");
+          card._flipAnimation = null;
+        }, { once: true });
+      } else {
+        window.setTimeout(() => card.classList.remove("is-flipping"), 220);
+      }
+    };
+    const move = (direction) => {
+      activeIndex = (activeIndex + direction + flashcards.length) % flashcards.length;
+      showingAnswer = false;
+      paint();
+    };
+
+    card.addEventListener("click", flip);
+    flipButton.addEventListener("click", flip);
+    area.querySelector("[data-prev-flash]").addEventListener("click", () => move(-1));
+    area.querySelector("[data-next-flash]").addEventListener("click", () => move(1));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        flip();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        move(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        move(1);
+      }
+    });
+  };
+
+  paint();
+  return;
+
   area.innerHTML = `
     <div class="flashcard-grid">
       ${flashcards.map(([front, back], index) => `
