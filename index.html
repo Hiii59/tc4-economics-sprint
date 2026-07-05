@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TC4 Economics Final Review</title>
+  <meta name="description" content="สรุปทบทวนสอบ TC4 เศรษฐศาสตร์ พร้อมกราฟ แบบฝึกหัด และเครื่องซ้อมโจทย์คำนวณ">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23182033'/%3E%3Cpath d='M13 42 25 28l9 8 16-20' fill='none' stroke='%2313a99a' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M13 18h38' stroke='%23f06449' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="กลับด้านบน">
+      <span class="brand-mark">TC4</span>
+      <span>
+        <strong>Economics Sprint</strong>
+        <small>Final review and exam lab</small>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="เปิดสารบัญ" aria-controls="tocPanel" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="topnav" id="tocPanel" aria-label="สารบัญหลัก">
+      <a href="#learn">อ่านสรุป</a>
+      <a href="#graphs">กราฟสำคัญ</a>
+      <a href="#memory-map">ผังจำง่าย</a>
+      <a href="#exam-lab">ซ้อมโจทย์</a>
+      <a href="#exam-pack">ชุดข้อสอบ</a>
+      <a href="#quick-test">เช็กจำ</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="kicker">TC4 - Thai Culture / Social Studies 4</p>
+        <h1>เศรษฐศาสตร์แบบอ่านรู้เรื่อง จำติด และทำโจทย์ได้จริง</h1>
+        <p class="hero-lead">
+          เว็บนี้สรุปจากไฟล์บทเรียนและสรุปทบทวนสอบ ครอบคลุมตั้งแต่ scarcity, PPF, demand-supply,
+          elasticity, social welfare, price ceiling, market structures ไปจนถึง market failure พร้อมโจทย์แนวสอบที่เปลี่ยนตัวเลขได้
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#exam-lab">เริ่มซ้อมโจทย์</a>
+          <a class="btn ghost" href="#learn">อ่านสรุปก่อน</a>
+        </div>
+        <div class="formula-rail" aria-label="สูตรที่ต้องจำ">
+          <span>Qd = a - bP</span>
+          <span>Qs = c + dP</span>
+          <span>W = CS + PS</span>
+          <span>DWL = พื้นที่เสียเปล่า</span>
+        </div>
+        <div class="exam-brief" aria-label="แนวข้อสอบ">
+          <div>
+            <span class="brief-label">แนวคำนวณ</span>
+            <strong>สมดุลตลาด, เพดานราคา, elasticity, social welfare</strong>
+          </div>
+          <div>
+            <span class="brief-label">ตอบสั้น</span>
+            <strong>3 ข้อย่อย ข้อละประมาณ 5 คะแนน</strong>
+          </div>
+          <div>
+            <span class="brief-label">กราฟ</span>
+            <strong>อ่านจุดสมดุล, shortage/surplus, CS/PS/DWL</strong>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="ภาพเคลื่อนไหวกราฟอุปสงค์อุปทาน">
+        <canvas id="heroMarketCanvas" width="720" height="520"></canvas>
+        <div class="market-hud">
+          <span>Demand</span>
+          <span>Supply</span>
+          <span>Equilibrium</span>
+          <span>Welfare</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tight" id="roadmap">
+      <div class="section-head">
+        <p class="kicker">Study Route</p>
+        <h2>อ่านตามลำดับนี้จะเห็นภาพใหญ่ก่อน แล้วค่อยลงสูตร</h2>
+      </div>
+      <div id="chapterGrid" class="chapter-grid"></div>
+    </section>
+
+    <section class="section" id="learn">
+      <div class="section-head">
+        <p class="kicker">Complete Notes</p>
+        <h2>สรุปเนื้อหาครบทุกบท</h2>
+        <p>แต่ละบทมีแก่นจำ สูตรที่ต้องใช้สอบ และจุดหลอกที่ออกเป็นคำถามสั้นได้ง่าย</p>
+      </div>
+      <div id="learningSections" class="learning-stack"></div>
+    </section>
+
+    <section class="section" id="graphs">
+      <div class="section-head">
+        <p class="kicker">Graph Board</p>
+        <h2>กราฟที่ต้องอ่านให้เป็น</h2>
+        <p>กราฟพวกนี้คือฐานของโจทย์คำนวณและข้อถามสั้น โดยเฉพาะสมดุลตลาด เพดานราคา และ social welfare</p>
+      </div>
+      <div class="visual-grid">
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="ppf" width="460" height="320"></canvas>
+          <h3>PPF และ opportunity cost</h3>
+          <p>จุดบนเส้นคือใช้ทรัพยากรเต็มที่ จุดในเส้นคือยังไม่เต็มประสิทธิภาพ จุดนอกเส้นคือทำไม่ได้ ณ ทรัพยากรเดิม</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="welfare" width="460" height="320"></canvas>
+          <h3>Social welfare</h3>
+          <p>สวัสดิการสังคมคือ CS + PS ถ้าตลาดแข่งขันสมบูรณ์และไม่มี market failure พื้นที่รวมจะมากที่สุด</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="tax" width="460" height="320"></canvas>
+          <h3>Tax incidence</h3>
+          <p>ภาษีทำให้ supply shift ขึ้น เกิด tax revenue และ DWL ฝั่งที่ยืดหยุ่นน้อยกว่ามักรับภาระภาษีมากกว่า</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="externality" width="460" height="320"></canvas>
+          <h3>Externality</h3>
+          <p>ผลกระทบภายนอกทำให้ราคาตลาดไม่สะท้อนต้นทุนหรือประโยชน์ทางสังคม จึงเกิด Qmarket ไม่เท่ากับ Qsocial</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="ceiling" width="460" height="320"></canvas>
+          <h3>Price ceiling</h3>
+          <p>ถ้าเพดานราคาต่ำกว่า P* จะ binding, Qd มากกว่า Qs, ปริมาณซื้อขายจริงเท่าฝั่งสั้น และเกิด DWL</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="shift" width="460" height="320"></canvas>
+          <h3>Shift vs movement</h3>
+          <p>ราคาเปลี่ยนเองคือ movement along curve ส่วนรายได้ รสนิยม ต้นทุน หรือเทคโนโลยีเปลี่ยนคือ shift ทั้งเส้น</p>
+        </article>
+        <article class="visual-card">
+          <canvas class="mini-graph" data-mini-graph="monopoly" width="460" height="320"></canvas>
+          <h3>Monopoly welfare loss</h3>
+          <p>ผู้ผูกขาดตั้ง P สูงกว่า MC และผลิต Q ต่ำกว่าระดับแข่งขัน ทำให้บางหน่วยที่ควรซื้อขายกลายเป็น DWL</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section memory-section" id="memory-map">
+      <div class="section-head">
+        <p class="kicker">Memory Map</p>
+        <h2>ผังจำและทริคก่อนลงโจทย์</h2>
+        <p>ใช้ผังนี้เป็นทางลัดเวลาเจอโจทย์กราฟหรือคำถามสั้น: เห็นสถานการณ์ให้แปลงเป็นเส้น จุด และพื้นที่ก่อน แล้วค่อยคำนวณ</p>
+      </div>
+      <div class="diagram-grid">
+        <article class="diagram-card">
+          <h3>เส้นทางคิดแบบเศรษฐศาสตร์</h3>
+          <div class="flow-line" aria-label="scarcity to welfare">
+            <span>Scarcity</span>
+            <span>Choice</span>
+            <span>Opportunity cost</span>
+            <span>Market</span>
+            <span>Welfare</span>
+          </div>
+          <p>ถ้าทรัพยากรจำกัด ต้องเลือก เมื่อเลือกมีต้นทุนค่าเสียโอกาส ตลาดจึงเป็นกลไกจัดสรร และ social welfare คือผลลัพธ์ที่ต้องประเมิน</p>
+        </article>
+        <article class="diagram-card">
+          <h3>สูตรอ่านกราฟข้อสอบ</h3>
+          <ol class="exam-flow">
+            <li>ตั้งหรืออ่าน `Qd = Qs` เพื่อหา `P*`, `Q*`</li>
+            <li>ดูว่านโยบายอยู่เหนือหรือต่ำกว่า `P*`</li>
+            <li>คำนวณ `Qd`, `Qs`, shortage/surplus ที่ราคานั้น</li>
+            <li>หาพื้นที่ CS, PS, tax revenue, DWL ตามที่โจทย์ถาม</li>
+          </ol>
+        </article>
+        <article class="diagram-card">
+          <h3>ทริคจำเร็ว</h3>
+          <ul class="memory-tips">
+            <li><strong>Ceiling ต่ำ</strong> กดราคาให้ถูก จึงขาดแคลน</li>
+            <li><strong>Floor สูง</strong> ดันราคาให้แพง จึงเหลือขาย</li>
+            <li><strong>Tax</strong> ทำให้เกิด wedge ระหว่างผู้ซื้อกับผู้ขาย</li>
+            <li><strong>DWL</strong> คือสามเหลี่ยมของการซื้อขายที่ควรเกิดแต่หายไป</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section lab-section" id="exam-lab">
+      <div class="section-head">
+        <p class="kicker">Simulation Lab</p>
+        <h2>เล่นกับกราฟเหมือนทดลองตลาดจริง</h2>
+        <p>ปรับ demand, supply, เพดานราคา, ภาษี หรือเลือกเหตุการณ์จำลอง แล้วดูว่าจุดสมดุล shortage, tax revenue และ DWL เปลี่ยนอย่างไร</p>
+      </div>
+      <div class="scenario-toolbar" aria-label="สถานการณ์จำลอง">
+        <button class="scenario-chip active" type="button" data-scenario="rent">ค่าเช่าห้องถูกคุมราคา</button>
+        <button class="scenario-chip" type="button" data-scenario="mask">หน้ากากช่วงของขาด</button>
+        <button class="scenario-chip" type="button" data-scenario="sugar">ภาษีน้ำตาล</button>
+        <button class="scenario-chip" type="button" data-scenario="education">อุดหนุนการศึกษา</button>
+      </div>
+      <div class="lab-layout">
+        <article class="panel calculator">
+          <div class="panel-title">
+            <h3>Demand-Supply Simulator</h3>
+            <span class="tag">ปรับค่าแล้วกราฟเปลี่ยนทันที</span>
+          </div>
+          <form id="marketForm" class="calc-form">
+            <label>a <input type="number" id="aInput" value="100"></label>
+            <label>b <input type="number" id="bInput" value="2" min="0.1" step="0.1"></label>
+            <label>c <input type="number" id="cInput" value="20"></label>
+            <label>d <input type="number" id="dInput" value="3" min="0.1" step="0.1"></label>
+            <label>Demand shift <input type="number" id="demandShiftInput" value="0" step="5"></label>
+            <label>Price ceiling <input type="number" id="ceilingInput" value="10" step="0.5"></label>
+            <label>Tax/unit <input type="number" id="taxInput" value="0" min="0" step="1"></label>
+          </form>
+          <canvas id="equilibriumCanvas" width="720" height="480"></canvas>
+          <div id="marketResults" class="result-grid"></div>
+          <div id="scenarioExplanation" class="scenario-explanation"></div>
+        </article>
+
+        <article class="panel drill-panel">
+          <div class="panel-title">
+            <h3>สุ่มโจทย์คำนวณ</h3>
+            <button class="icon-btn" id="newDrillBtn" type="button" aria-label="สุ่มโจทย์ใหม่">↻</button>
+          </div>
+          <div id="drillBox" class="drill-box"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section exam-pack" id="exam-pack">
+      <div class="section-head">
+        <p class="kicker">Exam Blueprint</p>
+        <h2>ชุดข้อสอบจำลองแบบน่าออกจริง</h2>
+        <p>รวมแนวคำนวณจากการบ้านที่เปลี่ยนตัวเลข แนวกราฟดุลยภาพ-เพดานราคา และตอบสั้น 5 คะแนนเรื่อง social welfare</p>
+      </div>
+      <div id="examBlueprintGrid" class="exam-blueprint-grid"></div>
+      <div class="case-shell">
+        <div class="case-toolbar">
+          <div>
+            <p class="kicker">Random Case</p>
+            <h3>โจทย์ชุดใหญ่ 15 คะแนน</h3>
+          </div>
+          <button class="mini-action primary" id="newExamCaseBtn" type="button">สุ่มชุดใหม่</button>
+        </div>
+        <div id="examCaseArea"></div>
+      </div>
+      <div id="scenarioDeck" class="scenario-deck"></div>
+    </section>
+
+    <section class="section" id="quick-test">
+      <div class="section-head">
+        <p class="kicker">Memory Booster</p>
+        <h2>แบบฝึกหัดกระตุ้นการจำ</h2>
+        <p>มีทั้งเลือกคำตอบ เติมช่องว่าง flashcards และข้อเขียนสั้นแบบที่น่าออกสอบ</p>
+      </div>
+      <div class="practice-tabs" role="tablist" aria-label="ประเภทแบบฝึกหัด">
+        <button class="tab active" data-practice-tab="mcq" type="button">เลือกคำตอบ</button>
+        <button class="tab" data-practice-tab="blank" type="button">เติมคำ</button>
+        <button class="tab" data-practice-tab="cards" type="button">Flashcards</button>
+        <button class="tab" data-practice-tab="short" type="button">ตอบสั้น</button>
+      </div>
+      <div id="practiceArea" class="practice-area"></div>
+    </section>
+
+    <section class="section final-list">
+      <div class="section-head">
+        <p class="kicker">Last 15 Minutes</p>
+        <h2>เช็กลิสต์ก่อนสอบ</h2>
+      </div>
+      <div class="checklist">
+        <label><input type="checkbox"> เขียนสูตร `Qd = a - bP`, `Qs = c + dP` และหา `P*`, `Q*` ได้โดยไม่เปิดเฉลย</label>
+        <label><input type="checkbox"> บอกได้ว่า price ceiling ต่ำกว่า equilibrium ทำให้เกิด shortage และ DWL</label>
+        <label><input type="checkbox"> แยก movement along curve กับ shift of curve ได้</label>
+        <label><input type="checkbox"> อธิบาย social welfare = CS + PS และอ่านพื้นที่จากกราฟได้</label>
+        <label><input type="checkbox"> ตีความ elasticity และรู้ว่า TR เปลี่ยนอย่างไรเมื่อขึ้นราคา</label>
+        <label><input type="checkbox"> เปรียบเทียบ perfect competition, monopoly, monopolistic competition, oligopoly ได้</label>
+        <label><input type="checkbox"> ยกตัวอย่าง market failure และมาตรการแก้ไขได้อย่างน้อย 4 แบบ</label>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="#top">กลับด้านบน</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

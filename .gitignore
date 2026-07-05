@@ -1,0 +1,14 @@
+.agents/
+.claude/
+.codex/
+.gemini/
+.impeccable/
+tmp/
+*.pdf
+*.zip
+*.docx
+*.pptx
+*.xlsx
+node_modules/
+.DS_Store
+Thumbs.db
